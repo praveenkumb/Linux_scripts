@@ -1,0 +1,31 @@
+---
+- name: Log cleanup and logrotate validation
+  hosts: linux_servers
+  become: yes
+
+  tasks:
+
+    - name: Find old log files older than 15 days
+      find:
+        paths: /var/log
+        patterns: "*.log"
+        age: 15d
+      register: old_logs
+
+    - name: Remove old log files
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_logs.files }}"
+
+    - name: Check logrotate configuration
+      command: logrotate -d /etc/logrotate.conf
+      register: logrotate_check
+      changed_when: false
+
+    - name: Display logrotate validation output
+      debug:
+        var: logrotate_check.stdout
+
+    - name: Force logrotate execution
+      command: logrotate -f /etc/logrotate.conf
