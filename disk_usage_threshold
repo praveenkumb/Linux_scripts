@@ -1,0 +1,16 @@
+---
+- name: Check disk usage threshold
+  hosts: linux_servers
+  become: yes
+
+  tasks:
+
+    - name: Get disk usage
+      shell: df -h | awk '{ print $5 " " $6 }' | grep -v Use%
+      register: disk_usage
+
+    - name: Show partitions above 80%
+      debug:
+        msg: "High Disk Usage: {{ item }}"
+      loop: "{{ disk_usage.stdout_lines }}"
+      when: item.split('%')[0] | int > 80
