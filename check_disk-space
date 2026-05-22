@@ -1,0 +1,14 @@
+---
+- name: Check Disk Space Usage
+  hosts: localhost
+  become: yes
+
+  tasks:
+
+    - name: Get disk usage
+      shell: df -hT
+      register: disk_output
+
+    - name: Display disk usage
+      debug:
+        var: disk_output.stdout_lines
