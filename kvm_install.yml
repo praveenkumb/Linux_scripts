@@ -1,0 +1,29 @@
+---
+- name: Install KVM setups
+  hosts: localhost
+  become: yes
+  vars:
+    packages_to_install:
+      - qemu-kvm
+      - virt-manager
+      - libvirt-daemon-system
+      - virtinst
+      - libvirt-clients
+      - bridge-utils
+      - virt-viewer
+      - python3-libvirt
+      - qemu-utils
+
+  tasks:
+    - name: install all
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages_to_install }}"
+      when: ansible_facts["distribution"] == "Ubuntu"
+
+    - name: Show messeges
+      loop: "{{ packages_to_install }}"
+      debug:
+        msg: "Installing {{ item }}"
+      when: ansible_facts["distribution"] == "Ubuntu"
