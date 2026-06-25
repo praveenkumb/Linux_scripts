@@ -1,0 +1,31 @@
+---
+- name: Install kvm virtulazation
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Install kvm
+      dnf:
+        name:
+          - @virtualization
+          - virt-install
+          - virt-manager
+          - libguestfs-tools
+        state: present
+       when: ansible_distribution == "Fedora"
+
+    - name: Install KVM and Virtualization packages (RHEL 8/9)
+      dnf:
+        name:
+          - "@Virtualization Host"
+          - virt-install
+          - virt-manager
+          - libguestfs-tools
+         state: present
+        when: ansible_distribution == "RedHat"
+
+      - name: Ensure virtqemud service is started and enabled (RHEL 9)
+        systemd:
+          name: virtqemud
+          state: started
+          enabled: yes
+       when: ansible_distribution == "RedHat" and ansible_distribution_major_version | int ==9
